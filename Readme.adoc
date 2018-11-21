@@ -30,7 +30,8 @@
 | setup-workstation | Setup workstation, create network, ssh keypair, security group etc. role 
 | osp-servers | Provision OSP Instances role
 | osp-instance-delete | Delete OSP Instances role
-| osp-facts | Genrate in-mmery inventory for OSP instances role
+| osp-facts | Genrate in-memory inventory for OSP instances role
+| roles/config-tower/vars/main.yml | Very important file to review. All the variable values are set there. Please do not make any changes in the file
 | config-tower | Role to configure ansible tower job templates and workflow
 | aws_creds.yml | Fetch GUIDkey.pem from bastion of Three tier application env and create machine credential to connect to AWS instances
 | aws_provision.yml | Use `order_svc.sh` script to provision env
@@ -49,5 +50,4 @@
 | roles/config-tower/tasks/pre-config-tower.yml | Any pre config tasks needed
 | roles/config-tower/tasks/workflow_template.yml | genrate workflow from `workflow.yml` file
 | roles/config-tower/tasks/post-config-tower.yml | any post config jobs
-| roles/config-tower/vars/main.yml | Very important file to review. All the variable values are set there. Please do not make any changes in the file
 |===
