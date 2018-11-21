@@ -1,0 +1,17 @@
+# Playbook to setup workstation and create osp network, router, SG and ssh keypair
+
+- hosts: localhost
+  tasks:
+  - name: Create workstation inventory
+    add_host:
+       name: "workstation-{{OSP_GUID}}.rhpds.opentlc.com"
+       group: workstation
+
+
+- hosts: workstation
+  become: yes
+  roles:
+    - setup-workstation
+
+- import_playbook: site-install-isolated-node.yml 
+

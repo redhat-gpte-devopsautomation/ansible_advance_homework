@@ -1,0 +1,3 @@
+param_user: {{opentlc_login}}
+param_password: {{opentlc_password}}
+param_repo_base: {{param_repo_base}}

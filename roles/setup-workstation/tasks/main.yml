@@ -1,0 +1,9 @@
+---
+# tasks file for setup-workstation
+- include_tasks: pre-tasks.yml
+- include_tasks: create-flavor.yml
+- include_tasks: create-keypair.yml
+- include_tasks: create-sg.yml
+- include_tasks: create-image.yml
+- include_tasks: create-network.yml
+

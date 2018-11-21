@@ -1,0 +1,16 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Append inventory file
+    blockinfile:
+      path: /root/ansible-tower-setup-latest/inventory
+      block: |
+        [isolated_group_osp]
+        workstation-{{OSP_GUID}}.rhpds.opentlc.com ansible_user='cloud-user' ansible_ssh_private_key_file='~/.ssh/openstack.pem' ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+        [isolated_group_osp:vars]
+        controller=tower
+      state: present
+  - name: Run Ansible Tower setup
+    shell: /root/ansible-tower-setup-latest/setup.sh
+    async: 3600
+    poll: 36

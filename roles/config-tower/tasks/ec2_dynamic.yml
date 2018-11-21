@@ -1,0 +1,41 @@
+- name: Create Dynamic Inventory
+  command: |
+    tower-cli inventory create -n "{{ec2_dynamic_inventory}}" --organization "{{org_name}}"
+
+
+- name: Create groups needed to deploy app
+  command: |
+    tower-cli group create -n "{{ item }}" --inventory "{{ec2_dynamic_inventory}}" 
+  loop:
+    - apps 
+    - appdbs
+    - frontends
+    - bastions
+    - tag_AnsibleGroup_bastions
+    - tag_AnsibleGroup_frontends
+    - tag_AnsibleGroup_apps
+    - tag_AnsibleGroup_appdbs
+
+- name: Associate AWS tags as children to bastions group
+  command: |
+    tower-cli group associate --group tag_AnsibleGroup_bastions --parent bastions --inventory "{{ec2_dynamic_inventory}}"
+
+- name: Associate AWS tags as children to frontends group
+  command: |
+    tower-cli group associate --group tag_AnsibleGroup_frontends --parent frontends --inventory "{{ec2_dynamic_inventory}}"
+
+- name: Associate AWS tags as children to apps group
+  command: |
+    tower-cli group associate --group tag_AnsibleGroup_apps --parent apps --inventory "{{ec2_dynamic_inventory}}"
+
+- name: Associate AWS tags as children to appdbs group
+  command: |
+    tower-cli group associate --group tag_AnsibleGroup_appdbs --parent appdbs --inventory "{{ec2_dynamic_inventory}}"
+
+- name: Add localhost as host 
+  command: |
+    tower-cli host create -n localhost --inventory "{{ec2_dynamic_inventory}}" --variables @/root/inventory_vars.json
+
+- name: Create inventory source with ec2 script
+  command: |
+    tower-cli inventory_source create -n "{{ec2_inventory_source}}" --inventory "{{ec2_dynamic_inventory}}" --source ec2 --credential "{{aws_read_keys}}" --source-regions "{{aws_region_name}}" --instance-filters "{{tag_filters}}" --overwrite yes --update-on-launch yes

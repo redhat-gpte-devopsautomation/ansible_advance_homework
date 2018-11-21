@@ -1,0 +1,33 @@
+- hosts: workstation
+  gather_facts: true
+  roles:
+  - name: osp-facts
+
+# Setup front-end load balancer tier
+
+
+- name: setup load-balancer tier
+  hosts: frontends
+  become: yes
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: lb-tier, tags: [lbs, haproxy]}
+
+# Setup application servers tier
+
+- name: setup app tier
+  hosts: apps
+  become: yes
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: app-tier, tags: [apps, tomcat]}
+
+# Setup database tier
+
+- name: setup database tier
+  become: yes
+  hosts: appdbs
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: geerlingguy.postgresql, tags: [dbs, postgres]}

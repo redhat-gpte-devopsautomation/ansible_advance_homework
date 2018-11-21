@@ -1,0 +1,13 @@
+- hosts: tag_instance_filter_three_tier_app_psrivast_redhat_com
+  gather_facts: false
+  tasks:
+  - name: Check the instances status
+    wait_for:
+      host: "{{ item }}"
+      port: 22
+      search_regex: OpenSSH
+      timeout: 600
+    delegate_to: localhost
+    with_items:
+      - "{{ inventory_hostname }}"
+        

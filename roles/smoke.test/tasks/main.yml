@@ -1,0 +1,45 @@
+---
+# tasks file for check
+- name: OpenStack servers
+  os_server_facts:
+    cloud: ospcloud
+    server: 'frontend'
+  register: openstack_info
+  tags:
+    - osp.smoke
+
+- name: Curl website
+  uri:
+    url: "http://{{item.public_v4}}"
+    return_content: yes
+  with_items:
+    - "{{ openstack_info.ansible_facts.openstack_servers }}"
+  register: webpage  
+  tags:
+    - osp.smoke
+
+- name: Fail if Status Code is not 200
+  fail:
+  when: item.status != 200
+  with_items: 
+  - "{{ webpage.results }}"
+  tags:
+  - osp.smoke
+
+
+- name: sleep for 600 seconds and continue with play
+  wait_for: timeout=600
+  tags: aws.smoke
+
+- name: Run a Curl Test against Frontend
+  uri:
+    url: http://{{ item }}
+    return_content: yes
+  with_items: "{{ groups['frontends'] }}"
+  register: webpage
+  tags: aws.smoke
+
+- name: Fail if 'Ansible has done its job' is not in the page content
+  fail:
+  when: "'Ansible has done its job' not in webpage.results[0].content"
+  tags: aws.smoke

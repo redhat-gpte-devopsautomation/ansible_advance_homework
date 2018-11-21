@@ -1,0 +1,13 @@
+- name: Create CI CD Workflow
+  command: |
+    tower-cli workflow create -n {{workflow_template_name}} --organization {{org_name}}
+
+- name: Create workflow schema 
+  template:
+    src: workflow.j2
+    dest: /root/workflow.yml
+
+- name: Create workflow using schema
+  command: |
+    tower-cli workflow schema {{workflow_template_name}} @/root/workflow.yml
+

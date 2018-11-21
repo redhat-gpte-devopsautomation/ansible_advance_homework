@@ -1,0 +1,36 @@
+- name: Setup Yum repos 
+  shell: scp ctrl.example.com:/etc/yum.repos.d/open.repo /etc/yum.repos.d/open.repo
+- name: yum clean
+  shell: yum clean all
+- name: Install EPEL repos 
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present 
+- name: install pip
+  yum:
+    name:
+      - python-pip
+      - gcc
+- name: Install openstacksdk library
+  pip:
+    name: openstacksdk
+    state: latest
+- name: Create clouds.yaml file
+  blockinfile:
+    create: yes
+    path: /etc/openstack/clouds.yaml
+    block: |2
+      clouds:
+        ospcloud:
+          auth:
+            auth_url: http://192.168.0.20:5000/
+            password: r3dh4t1!
+            project_name: admin
+            username: admin
+          identity_api_version: '3.0'
+          region_name: RegionOne
+- name: Set openstack.pub authorized key from file
+  authorized_key:
+    user: cloud-user
+    state: present
+    key: "{{ lookup('file', '/root/.ssh/openstack.pub') }}"

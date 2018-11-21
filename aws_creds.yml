@@ -1,0 +1,55 @@
+- hosts: tag_AnsibleGroup_bastions
+  gather_facts: true
+  become: true
+  tasks:
+  - name: Install required packages 
+    yum: 
+     name: "{{item}}"
+     state: latest 
+    loop: 
+      - python 
+      - python-pip 
+      - python-devel 
+      - gcc
+  - name: Install tower-cli
+    pip:
+     name: ansible-tower-cli
+     state: latest
+  - name: List key files
+    shell: (cd /root/.ssh; find . -maxdepth 1 -type f -iname '*key.pem')| cut -d'/' -f2
+    register: file_to_copy
+  - name: Tower Creds key file
+    tower_credential:
+      name: Creds for AWS instances
+      organization: Default
+      state: present
+      kind: ssh
+      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_username: admin
+      tower_password: r3dh4t1!
+      ssh_key_data: "/root/.ssh/{{ file_to_copy.stdout }}"
+      username: ec2-user
+  - name: Update Prod Job template
+    tower_job_template:
+      name: "3 tier app on Prod"
+      machine_credential: "Creds for AWS instances"
+      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_username: admin
+      tower_password: r3dh4t1!
+      state: present
+      job_type: run
+      playbook: site-3tier-app.yml
+      project: "Homework Assignment"
+  - name: Update Prod Smoke Job template
+    tower_job_template:
+      name: "Smoke test Prod env"
+      machine_credential: "Creds for AWS instances"
+      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_username: admin
+      tower_password: r3dh4t1!
+      state: present
+      job_type: run
+      playbook: site-smoketest-aws.yml
+      project: "Homework Assignment"
+
+    
