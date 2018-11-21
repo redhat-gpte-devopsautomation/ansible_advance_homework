@@ -1,18 +1,5 @@
 - hosts: frontends
   gather_facts: false
   tasks:
-  - name: Curl website
-    uri:
-     url: "http://{{ item }}"
-     return_content: yes
-    with_items:
-      - "{{ inventory_hostname }}"
-    register: webpage
-    tags:
-      - osp.smoke
-
+  - name: Use Uri module for wrting smoke test.
   - name: Fail if 'Ansible has done its job' is not in the page content
-    fail:
-    when: "'Ansible has done its job' not in webpage.results[0].content"
-    tags:
-      - osp.smoke
