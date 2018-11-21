@@ -28,7 +28,7 @@
   tasks:
   - name: Curl website
     uri:
-     url: "http://frontend1.{{ THREE_TIER_GUID }}.example.opentlc.com"
+     url: "http://frontend1.{{ ANSIBLE_ADVANCE_GUID }}.example.opentlc.com"
      return_content: yes
     register: webpage
   - name: Fail if 'Ansible has done its job' is not in the page content
