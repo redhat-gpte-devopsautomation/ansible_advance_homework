@@ -44,7 +44,7 @@
 | site-setup-workstation.yml | Playbook to call role
 | site-smoke-osp.yml | Playbook to test three tier app on OSP
 | site-smoketest-aws.yml | Playbook to call role `smoke.tests` role
-| grading-script.sh | Self grading script
+| grading-script.yml | Self grading script
 | roles/config-tower/tasks/ec2_dynamic.yml | For creating Dynamic inventory in Ansible tower. Use `AWS Access Key` for credential
 | roles/config-tower/tasks/job_template.yml | For creating job templates
 | roles/config-tower/tasks/pre-config-tower.yml | Any pre config tasks needed
