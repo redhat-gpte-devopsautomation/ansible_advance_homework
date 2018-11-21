@@ -1,7 +1,2 @@
 ---
-
-- name: start {{ payload }}
-  service:
-    name: tomcat
-    state: started
-
+# handlers file for app-tier

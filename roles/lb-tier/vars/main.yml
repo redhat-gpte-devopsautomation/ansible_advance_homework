@@ -1,1 +1,2 @@
-payload: haproxy
+---
+# vars file for lb-tier
