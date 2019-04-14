@@ -1,0 +1,15 @@
+---
+# tasks file for postgresql
+
+- name: close the firewall port
+  firewalld:
+    state: absent
+    port: "{{ postgresql_port }}/tcp"
+    permanent: false
+    immediate: true
+  when: not ansible_check_mode
+
+- name: remove postgresql
+  yum:
+    name: "{{ postgresql_packages }}"
+    state: absent

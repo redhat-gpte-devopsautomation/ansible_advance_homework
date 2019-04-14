@@ -1,0 +1,10 @@
+---
+# tasks file for base
+
+- import_tasks: install.yml
+  tags: install_base
+  when: base_installed == true
+
+- import_tasks: remove.yml
+  tags: remove_base
+  when: base_installed == false

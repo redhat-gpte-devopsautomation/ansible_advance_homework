@@ -1,0 +1,9 @@
+---
+# defaults file for base
+
+base_installed: true
+base_repo_dir: /etc/yum.repos.d
+base_repo_hostname: admin.na.shared.opentlc.com
+base_packages:
+  - python-firewall
+  - firewalld

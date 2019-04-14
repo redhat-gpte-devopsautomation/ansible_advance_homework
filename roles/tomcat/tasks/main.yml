@@ -1,0 +1,10 @@
+---
+# tasks file for tomcat
+
+- import_tasks: install.yml
+  tags: install_tomcat
+  when: tomcat_installed == true
+
+- import_tasks: remove.yml
+  tags: remove_tomcat
+  when: tomcat_installed == false

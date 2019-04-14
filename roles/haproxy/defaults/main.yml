@@ -1,0 +1,12 @@
+---
+# defaults file for haproxy
+
+haproxy_installed: true
+haproxy_packages:
+  - haproxy
+haproxy_user: haproxy
+haproxy_group: "{{ haproxy_user }}"
+haproxy_port: 80
+haproxy_conf_dir: /etc/haproxy
+haproxy_lib_dir: /var/lib/haproxy
+haproxy_pid_dir: /var/run/haproxy

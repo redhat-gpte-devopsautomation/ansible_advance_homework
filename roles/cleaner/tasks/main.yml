@@ -1,0 +1,33 @@
+---
+# Initial, common, system setup steps
+
+- include_vars: "{{ item }}"
+  with_items:
+  - "../../base/defaults/main.yml"
+  - "../../firewalld/defaults/main.yml"
+  - "../../haproxy/defaults/main.yml"
+  - "../../tomcat/defaults/main.yml"
+  - "../../postgresql/defaults/main.yml"
+
+- name: remove repo file
+  file:
+    state: absent
+    path: "{{ base_repodir }}/open_three-tier-app.repo"
+  when: not ansible_check_mode
+
+- name: remove base tools and three tier app packages
+  yum:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ haproxy_packages }}"
+    - "{{ tomcat_packages }}"
+    - "{{ postgresql_packages }}"
+
+#- name: reverse the enabling of sudo without tty for some ansible commands
+#  replace:
+#    path: /etc/sudoers
+#    regexp: 'Defaults\s*!requiretty'
+#    replace: '^Defaults requiretty'
+#    backup: yes
+#  when: not ansible_check_mode

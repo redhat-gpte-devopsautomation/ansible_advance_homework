@@ -1,0 +1,15 @@
+---
+# tasks file for haproxy
+
+- name: close the firewall port
+  firewalld:
+    state: absent
+    port: "{{ haproxy_port }}/tcp"
+    permanent: false
+    immediate: true
+  when: not ansible_check_mode
+
+- name: Remove HAProxy
+  yum:
+    name: "{{ haproxy_packages }}"
+    state: absent

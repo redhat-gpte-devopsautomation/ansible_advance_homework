@@ -1,0 +1,30 @@
+global
+    log 127.0.0.1 local0 debug
+    chroot {{ haproxy_lib_dir }}
+    pidfile "{{ haproxy_pid_dir }}/haproxy.pid"
+    maxconn 20000
+    daemon
+    nbproc 2
+    user {{ haproxy_user }}
+    group {{ haproxy_group }}
+
+defaults
+    log global
+    mode  http
+    option httplog
+    option forwardfor
+    option dontlognull
+
+frontend app-servers
+    bind *:{{ haproxy_port }}
+    mode http
+    option httplog
+    default_backend app-server-http
+
+backend app-server-http
+    mode http
+    balance roundrobin
+    option forwardfor
+{% for host in groups.apps %}
+    server app{{ loop.index }} {{ hostvars[host].ansible_host }}:{{ tomcat_port }} check cookie app{{ loop.index }}
+{% endfor %}

@@ -1,0 +1,8 @@
+---
+# handlers file for haproxy
+
+- name: restart haproxy service
+  systemd:
+    name: haproxy
+    state: restarted
+    enabled: true

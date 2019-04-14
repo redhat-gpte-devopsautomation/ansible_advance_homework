@@ -1,0 +1,25 @@
+---
+# tasks file for haproxy
+
+- include_vars: "{{ item }}"
+  with_items:
+  - "../../tomcat/defaults/main.yml"
+
+- name: install HAProxy
+  yum:
+    name: "{{ haproxy_packages }}"
+    state: latest
+
+- name: open the firewall port
+  firewalld:
+    state: enabled
+    port: "{{ haproxy_port }}/tcp"
+    permanent: true
+    immediate: true
+  when: not ansible_check_mode
+
+- name: generate haproxy configuration file from jinga2 template
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_conf_dir }}/haproxy.cfg"
+  notify: restart haproxy service

@@ -1,0 +1,13 @@
+---
+# tasks file for base
+
+- name: Remove base
+  yum:
+    name: "{{ base_packages }}"
+    state: absent
+
+- name: copy yum .repo file
+  file:
+    dest: "{{ base_repo_dir }}/open_three-tier-app.repo"
+    state: absent
+  when: not ansible_check_mode

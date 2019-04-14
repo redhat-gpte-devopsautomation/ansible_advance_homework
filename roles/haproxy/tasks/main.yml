@@ -1,0 +1,10 @@
+---
+# tasks file for haproxy
+
+- import_tasks: install.yml
+  tags: install_haproxy
+  when: haproxy_installed == true
+
+- import_tasks: remove.yml
+  tags: remove_haproxy
+  when: haproxy_installed == false
