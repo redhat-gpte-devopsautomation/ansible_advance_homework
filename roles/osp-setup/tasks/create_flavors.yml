@@ -1,0 +1,12 @@
+---
+# tasks file for osp-setup
+
+ - name: create flavors
+   os_nova_flavor:
+      cloud: "{{ cloud_name }}"
+      name: "{{ item.name }}"
+      ram: "{{ item.ram }}"
+      vcpus: "{{ item.vcpus }}"
+      disk: "{{ item.disk }}"
+      state: present
+   loop: "{{ flavors }}"

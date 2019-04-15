@@ -1,2 +1,10 @@
 ---
-# defaults file for setup-workstation
+# defaults file for jumpbox
+
+prerequsite_packages:
+  - python-pip
+  - git
+pip_packages:
+  - openstacksdk
+  - ansible
+openstack_auth_dir: /etc/openstack

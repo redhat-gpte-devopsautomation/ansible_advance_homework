@@ -1,0 +1,16 @@
+---
+# tasks file for osp-setup
+
+- name: download RHEL image
+  get_url:
+     url: "{{ image_url }}/{{ image_file }}"
+     dest: /tmp/{{ image_name }}.{{ image_format }}
+
+- name: create openstack guest image
+  os_image:
+     cloud: "{{ cloud_name }}"
+     name: "{{ image_name }}"
+     container_format: bare
+     disk_format: "{{ image_format }}"
+     state: present
+     filename: /tmp/{{ image_name }}.{{ image_format }}

@@ -1,17 +1,37 @@
-# Playbook to setup workstation and create osp network, router, SG and ssh keypair
+---
 
 - hosts: localhost
+  connection: local
   tasks:
-  - name: Create workstation inventory
+  - name: create workstation inventory
     add_host:
-       name: "workstation-{{OSP_GUID}}.rhpds.opentlc.com"
-       group: workstation
+      name: "workstation-{{ OSP_GUID }}.rhpds.opentlc.com"
+      group: workstation-openstack
 
-
-- hosts: workstation
-  become: yes
+- hosts: workstation-openstack
+  become: true
   roles:
-    - setup-workstation
+    - { role: setup-workstation }
+    - { role: osp-setup }
 
-- import_playbook: site-install-isolated-node.yml 
+# Set up islated node for Ansible Tower
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+  - roles/osp-setup/defaults/main.yml
+  tasks:
+  - name: append inventory file
+    blockinfile:
+      path: /root/ansible-tower-setup-latest/inventory
+      block: |
+        [isolated_group_osp]
+        workstation-{{ OSP_GUID }}.rhpds.opentlc.com ansible_user={{ ssh_user }} ansible_ssh_private_key_file='~/.ssh/openstack.pem' ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+        [isolated_group_osp:vars]
+        controller=tower
+      state: present
 
+  - name: install Ansible Tower
+    shell: /root/ansible-tower-setup-latest/setup.sh
+    async: 3600
+    poll: 36

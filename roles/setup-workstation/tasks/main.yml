@@ -1,9 +1,36 @@
 ---
-# tasks file for setup-workstation
-- include_tasks: pre-tasks.yml
-- include_tasks: create-flavor.yml
-- include_tasks: create-keypair.yml
-- include_tasks: create-sg.yml
-- include_tasks: create-image.yml
-- include_tasks: create-network.yml
+# tasks file for jumpbox
 
+- include_vars: "../../osp-setup/defaults/main.yml"
+
+- name: clean any cached packages and metadata
+  shell: yum clean all
+
+- name: install pre-requisite RPM packages
+  yum:
+    name: "{{ prerequsite_packages }}"
+    state: latest
+
+- name: install pre-requisite pip packages
+  pip:
+    name: "{{ item }}"
+    state: latest
+    extra_args: -U
+  loop: "{{ pip_packages }}"
+
+- name: create credential directory
+  file:
+    name: "{{ openstack_auth_dir }}"
+    state: directory
+
+- name: create clouds.yaml for openstack identity
+  template:
+    src: clouds.yaml.j2
+    dest: "{{ openstack_auth_dir }}/clouds.yaml"
+
+- name: set ssh public key
+  authorized_key:
+    user: "{{ ssh_user }}"
+    state: present
+    key: "{{ publickey_url }}"
+    validate_certs: false

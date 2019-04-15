@@ -1,0 +1,9 @@
+---
+# tasks file for osp-setup
+
+- name: create keypairs
+  os_keypair:
+    cloud: "{{ cloud_name }}"
+    name: "{{ keypair_name }}"
+    public_key: "{{ lookup('url', '{{ keypair_publickey_url }}') }}"
+    state: present

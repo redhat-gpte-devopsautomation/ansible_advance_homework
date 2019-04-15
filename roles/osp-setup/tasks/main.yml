@@ -1,7 +1,22 @@
 ---
-# tasks file for roles/osp-lab
-- include_tasks: create-image.yml
-- include_tasks: create-flavor.yml
-- include_tasks: create-keypair.yml
-- include_tasks: create-network.yml
-- include_tasks: create-sg.yml
+# tasks file for osp-setup
+
+- name: create images
+  include_tasks: create_images.yml
+  tags: create_images
+
+- name: create create_flavors
+  include_tasks: create_flavors.yml
+  tags: create_flavors
+
+- name: create keypairs
+  include_tasks: create_keypairs.yml
+  tags: create_keypairs
+
+- name: create securitygroups
+  include_tasks: create_securitygroups.yml
+  tags: create_securitygroups
+
+- name: create networks
+  include_tasks: create_networks.yml
+  tags: create_networks

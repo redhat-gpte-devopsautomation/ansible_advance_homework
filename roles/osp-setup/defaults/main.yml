@@ -1,2 +1,65 @@
 ---
-# defaults file for roles/osp-lab
+# defaults file for osp-setup
+
+cloud_name: ospcloud
+region_name: RegionOne
+keystone_auth_url: http://192.168.0.20:5000/
+keystone_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38643336623964663631386565366630663734353131373734366130636265616534323865363764
+          3839313631383064396431313066323666306439626336310a636531376137613362373436633435
+          35343836363736366330623066633431653735353866653330323563346561626365326630633538
+          3132366664343733370a316136636566323437323435376461633238313438343638646261616335
+          3964
+keystone_username: admin
+project_name: admin
+publickey_url: http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
+
+flavors:
+  - { name: 'm2.small', ram: '2048', vcpus: '1', disk: '10' }
+
+image_url: http://www.opentlc.com/download/osp_advanced_networking
+image_format: qcow2
+image_name: rhel-guest
+image_file: "{{ image_name }}-image-7.2-20151102.0.x86_64.{{ image_format }}"
+
+keypair_name: ansible_ssh
+keypair_publickey_url: http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
+ssh_user: cloud-user
+
+security_group_frontend: frontends
+security_group_application: apps
+security_group_database: appdbs
+security_groups:
+  - { name: '{{ security_group_frontend }}', description: 'SSH and Application' }
+  - { name: '{{ security_group_application }}', description: 'HTTP' }
+  - { name: '{{ security_group_database }}', description: 'Database' }
+security_group_rule_application:
+  - { name: '{{ security_group_application }}', port: '22', protocol: 'tcp', prefix: '{{ network_any }}' }
+  - { name: '{{ security_group_application }}', port: '8080', protocol: 'tcp', prefix: '{{ network_any }}' }
+security_group_rule_frontend:
+  - { name: '{{ security_group_frontend }}', port: '22', protocol: 'tcp', prefix: '{{ network_any }}' }
+  - { name: '{{ security_group_frontend }}', port: '80', protocol: 'tcp', prefix: '{{ network_any }}' }
+  - { name: '{{ security_group_frontend }}', port: '443', protocol: 'tcp', prefix: '{{ network_any }}' }
+security_group_rule_database:
+  - { name: '{{ security_group_database }}', port: '22', protocol: 'tcp', prefix: '{{ network_any }}' }
+  - { name: '{{ security_group_database }}', port: '5432', protocol: 'tcp', prefix: '{{ subnet_internal_cidr }}' }
+
+dns_first: 8.8.8.7
+dns_second: 8.8.8.8
+network_any: 0.0.0.0/0
+network_route_external: 192.168.0.0/24
+subnet_external_cidr: 10.10.10.0/24
+subnet_internal_cidr: 20.20.20.0/24
+networks:
+  external:
+    name: ext_network
+    subnet: ext_subnet
+    external: true
+  internal:
+    name: int_network
+    subnet: int_subnet
+    external: false
+router_name: router
+
+deployment_name: qe

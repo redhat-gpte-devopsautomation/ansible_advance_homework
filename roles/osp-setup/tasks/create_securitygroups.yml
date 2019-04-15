@@ -1,0 +1,23 @@
+---
+# tasks file for osp-setup
+
+- name: create security groups
+  os_security_group:
+    cloud: "{{ cloud_name }}"
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    state: present
+  loop: "{{ security_groups }}"
+
+- name: set security group rules
+  os_security_group_rule:
+    cloud: "{{ cloud_name }}"
+    security_group: "{{ item.name }}"
+    protocol: "{{ item.protocol }}"
+    port_range_min: "{{ item.port }}"
+    port_range_max: "{{ item.port }}"
+    remote_ip_prefix: "{{ item.prefix }}"
+  with_items:
+    - "{{ security_group_rule_application }}"
+    - "{{ security_group_rule_frontend }}"
+    - "{{ security_group_rule_database }}"

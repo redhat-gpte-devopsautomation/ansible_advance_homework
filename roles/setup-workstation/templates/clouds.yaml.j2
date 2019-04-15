@@ -1,0 +1,13 @@
+clouds:
+  {{ cloud_name }}:
+    auth:
+      auth_url: {{ keystone_auth_url }}
+      password: {{ keystone_password }}
+      project_name: {{ project_name }}
+      username: {{ keystone_username }}
+    identity_api_version: '3.0'
+    region_name: {{ region_name }}
+ansible:
+  use_hostnames: True
+  expand_hostvars: False
+  fail_on_errors: True

@@ -1,0 +1,48 @@
+---
+# tasks file for osp-setup
+
+- name: create networks
+  os_network:
+    cloud: "{{ cloud_name }}"
+    name: "{{ item.value.name }}"
+    external: "{{ item.value.external }}"
+    state: present
+  loop: "{{ lookup('dict', networks) }}"
+
+- name: create public subnet
+  os_subnet:
+    cloud: "{{ cloud_name }}"
+    network_name: "{{ networks.external.name }}"
+    name: "{{ networks.external.subnet }}"
+    cidr: "{{ subnet_external_cidr }}"
+    dns_nameservers:
+      - "{{ dns_first }}"
+      - "{{ dns_second }}"
+    host_routes:
+      - destination: "{{ network_any }}"
+        nexthop: "{{ subnet_external_cidr | ipaddr('network') }}"
+      - destination: "{{ network_route_external }}"
+        nexthop: "{{ network_route_external | ipaddr('network') }}"
+    state: present
+
+- name: create private subnet
+  os_subnet:
+    cloud: "{{ cloud_name }}"
+    network_name: "{{ networks.internal.name }}"
+    name: "{{ networks.internal.subnet }}"
+    cidr: "{{ subnet_internal_cidr }}"
+    host_routes:
+      - destination: "{{ network_any }}"
+        nexthop: "{{ subnet_internal_cidr | ipaddr('network') }}"
+    state: present
+
+- name: create router
+  os_router:
+    cloud: "{{ cloud_name }}"
+    name: "{{ router_name }}"
+    network: "{{ networks.external.name }}"
+    external_fixed_ips:
+      - subnet: "{{ networks.external.subnet }}"
+    interfaces:
+      - "{{ networks.internal.subnet }}"
+    state: present
