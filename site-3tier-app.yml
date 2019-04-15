@@ -1,14 +1,16 @@
+---
+
 - hosts: workstation
   gather_facts: true
   roles:
-  - name: osp-facts
+  - { role: osp-facts }
 
-- name: setup load-balancer
-  hosts: frontends
+- name: setup database server
+  hosts: appdbs
   gather_facts: false
   become: true
   roles:
-  - { role: haproxy }
+  - { role: postgresql }
 
 - name: setup applicaton server
   hosts: apps
@@ -17,9 +19,9 @@
   roles:
   - { role: tomcat }
 
-- name: setup database server
-  hosts: appdbs
+- name: setup load-balancer
+  hosts: frontends
   gather_facts: false
   become: true
   roles:
-  - { role: postgresql }
+  - { role: haproxy }

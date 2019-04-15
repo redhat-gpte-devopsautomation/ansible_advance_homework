@@ -1,0 +1,30 @@
+
+- name: clean up frontends
+  hosts: frontends
+  gather_facts: false
+  vars:
+    - base_installed: false
+    - haproxy_installed: false
+  become: true
+  roles:
+    - { role: haproxy }
+
+- name: clean up apps
+  hosts: apps
+  gather_facts: false
+  vars:
+    - base_installed: false
+    - tomcat_installed: false
+  become: true
+  roles:
+    - { role: tomcat }
+
+- name: clean up appdbs
+  hosts: appdbs
+  gather_facts: false
+  vars:
+    - base_installed: false
+    - postgresql_installed: false
+  become: true
+  roles:
+    - { role: postgresql }

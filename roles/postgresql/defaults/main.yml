@@ -5,3 +5,4 @@ postgresql_installed: true
 postgresql_packages:
   - postgresql-server
 postgresql_port: 5432
+postgresql_data_dir: /var/lib/pgsql/data

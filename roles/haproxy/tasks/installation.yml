@@ -18,8 +18,23 @@
     immediate: true
   when: not ansible_check_mode
 
-- name: generate haproxy configuration file from jinga2 template
+- name: generate haproxy.cfg
   template:
     src: haproxy.cfg.j2
     dest: "{{ haproxy_conf_dir }}/haproxy.cfg"
-  notify: restart haproxy service
+
+- name: restart haproxy service
+  systemd:
+    name: haproxy
+    state: restarted
+    enabled: true
+
+- name: check http response
+  uri:
+    url: http://{{ ansible_host }}:{{ haproxy_port }}
+    return_content: true
+  register: haproxy_result
+  until: haproxy_expected_response in haproxy_result.content
+  retries: 3
+  delay: 3
+  when: not ansible_check_mode

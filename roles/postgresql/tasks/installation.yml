@@ -13,3 +13,13 @@
     permanent: true
     immediate: true
   when: not ansible_check_mode
+
+- name: check if postgresql is installed
+  stat:
+    path: "{{ postgresql_data_dir }}"
+  register: check_postgrsql_data_dir
+  ignore_errors: true
+
+- name: initialize database
+  shell: postgresql-setup initdb
+  when: check_postgrsql_data_dir is not defined

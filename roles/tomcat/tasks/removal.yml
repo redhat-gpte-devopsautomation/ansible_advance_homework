@@ -1,0 +1,7 @@
+---
+# tasks file for tomcat
+
+- name: Remove tomcat
+  yum:
+    name: "{{ tomcat_packages }}"
+    state: absent

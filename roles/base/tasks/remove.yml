@@ -1,12 +1,12 @@
 ---
 # tasks file for base
 
-- name: Remove base
+- name: remove base packages
   yum:
     name: "{{ base_packages }}"
     state: absent
 
-- name: copy yum .repo file
+- name: remove yum .repo file
   file:
     dest: "{{ base_repo_dir }}/open_three-tier-app.repo"
     state: absent

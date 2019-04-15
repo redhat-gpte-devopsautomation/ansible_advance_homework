@@ -1,0 +1,7 @@
+---
+# tasks file for postgresql
+
+- name: remove postgresql
+  yum:
+    name: "{{ postgresql_packages }}"
+    state: absent

@@ -1,10 +1,10 @@
 ---
 # tasks file for postgresql
 
-- import_tasks: install.yml
+- import_tasks: installation.yml
   tags: install_postgresql
   when: postgresql_installed == true
 
-- import_tasks: remove.yml
+- import_tasks: removal.yml
   tags: remove_postgresql
   when: postgresql_installed == false

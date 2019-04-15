@@ -10,4 +10,9 @@
   yum:
     name: "{{ base_packages }}"
     state: latest
-  notify: start firewalld
+
+- name: start firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: true

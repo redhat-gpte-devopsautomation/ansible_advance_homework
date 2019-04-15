@@ -10,3 +10,4 @@ haproxy_port: 80
 haproxy_conf_dir: /etc/haproxy
 haproxy_lib_dir: /var/lib/haproxy
 haproxy_pid_dir: /var/run/haproxy
+haproxy_expected_response: "Welcome to Tomcat on"

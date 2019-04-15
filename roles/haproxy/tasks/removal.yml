@@ -1,0 +1,7 @@
+---
+# tasks file for haproxy
+
+- name: Remove HAProxy
+  yum:
+    name: "{{ haproxy_packages }}"
+    state: absent
