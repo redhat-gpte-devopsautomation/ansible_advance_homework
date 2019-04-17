@@ -7,4 +7,4 @@ tomcat_packages:
   - tomcat
 tomcat_port: 8080
 tomcat_webappdir: /usr/share/tomcat/webapps
-tomcat_expected_response: "Welcome to Tomcat on {{ inventory_hostname }}"
+tomcat_expected_response: "Welcome to Tomcat on"

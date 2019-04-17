@@ -31,6 +31,9 @@
     network_name: "{{ networks.internal.name }}"
     name: "{{ networks.internal.subnet }}"
     cidr: "{{ subnet_internal_cidr }}"
+    dns_nameservers:
+      - "{{ dns_first }}"
+      - "{{ dns_second }}"
     host_routes:
       - destination: "{{ network_any }}"
         nexthop: "{{ subnet_internal_cidr | ipaddr('network') }}"

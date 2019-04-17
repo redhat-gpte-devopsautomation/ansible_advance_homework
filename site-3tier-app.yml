@@ -1,27 +1,28 @@
 ---
 
-- hosts: workstation
+- name: get instance facts and add hosts to group
+  hosts: workstation
   gather_facts: true
   roles:
-  - { role: osp-facts }
+    - { role: osp-facts }
 
 - name: setup database server
   hosts: appdbs
   gather_facts: false
   become: true
   roles:
-  - { role: postgresql }
+    - { role: postgresql }
 
 - name: setup applicaton server
   hosts: apps
   gather_facts: false
   become: true
   roles:
-  - { role: tomcat }
+    - { role: tomcat }
 
 - name: setup load-balancer
   hosts: frontends
-  gather_facts: false
+  gather_facts: true
   become: true
   roles:
-  - { role: haproxy }
+    - { role: haproxy }

@@ -1,5 +1,14 @@
 ---
-# tasks file for roles/osp-instance-delete
-  - name: Fetch Instance Info
-  - name: Delete instances
-   
+# tasks file for osp-instance-delete
+
+- include_vars: "../../osp-setup/defaults/main.yml"
+
+- name: delete instances
+  os_server:
+    cloud: "{{ cloud_name }}"
+    name: "{{ hostvars[item].inventory_hostname }}"
+    state: absent
+    delete_fip: true
+    wait: true
+  with_inventory_hostnames: frontends:apps:appdbs
+  when: not ansible_check_mode

@@ -1,2 +1,4 @@
 ---
 # defaults file for osp.servers
+
+deployment_name: QA

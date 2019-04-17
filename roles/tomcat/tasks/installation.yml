@@ -34,7 +34,6 @@
     src: index.html.j2
     dest: "{{ tomcat_webappdir }}/ROOT/index.html"
     mode: 0644
-  notify: check http response
 
 - name: copy static index.html.app
   template:
@@ -47,6 +46,6 @@
     return_content: true
   register: tomcat_result
   until: tomcat_expected_response in tomcat_result.content
-  retries: 3
-  delay: 3
+  retries: 5
+  delay: 5
   when: not ansible_check_mode

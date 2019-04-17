@@ -1,4 +1,30 @@
-- hosts: workstation
-  become: yes
+---
+
+- name: create instances and install 3-tier applicatons
+  hosts: workstation
+  become: true
+  gather_facts: true
   roles:
-    - osp-servers
+    - { role: osp-servers }
+    - { role: osp-facts }
+
+- name: setup database server
+  hosts: appdbs
+  gather_facts: true
+  become: true
+  roles:
+    - { role: postgresql }
+
+- name: setup applicaton server
+  hosts: apps
+  gather_facts: true
+  become: true
+  roles:
+    - { role: tomcat }
+
+- name: setup load-balancer
+  hosts: frontends
+  gather_facts: true
+  become: true
+  roles:
+    - { role: haproxy }

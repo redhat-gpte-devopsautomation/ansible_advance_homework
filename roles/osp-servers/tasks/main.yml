@@ -1,10 +1,39 @@
 ---
+# tasks file for osp-servers
 
-# tasks file for osp.servers
-- name: Create new server instances and attaches them a network and passes metadata to the instance
+- include_vars: "../../osp-setup/defaults/main.yml"
 
+- name: create instances and attaches them a network
+  os_server:
+    cloud: "{{ cloud_name }}"
+    name: "{{ hostvars[item].inventory_hostname }}"
+    image: "{{ image_name }}"
+    meta: "group={{ hostvars[item].group_names.1 }},deployment_name={{ deployment_name }}"
+    flavor: "{{ hostvars[item].flavor }}"
+    security_groups: "{{ hostvars[item].group_names.1 }}"
+    key_name: "{{ keypair_name }}"
+    nics:
+    - net-name: "{{ networks.internal.name }}"
+    wait: true
+  with_inventory_hostnames: frontends:apps:appdbs
+  when: not ansible_check_mode
 
-- name: Add floating IP to Servers
-   
+- name: add floating IP addresses to instances
+  os_floating_ip:
+    cloud: "{{ cloud_name }}"
+    server: "{{ hostvars[item].inventory_hostname }}"
+    network: "{{ networks.external.name }}"
+    wait: true
+  register: floating_ip
+  with_inventory_hostnames: frontends:apps:appdbs
+  when: not ansible_check_mode
 
-- name: Wait for server to be available
+- name: wait for server to be available
+  wait_for:
+    host: "{{ item.floating_ip.floating_ip_address }}"
+    state: started
+    port: 22
+    delay: 10
+  retries: 3
+  delay: 3
+  with_items: "{{ floating_ip.results }}"

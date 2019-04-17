@@ -1,3 +1,10 @@
+---
+
+- name: get instance facts and add hosts to group
+  hosts: workstation
+  gather_facts: true
+  roles:
+    - { role: osp-facts }
 
 - name: clean up frontends
   hosts: frontends

@@ -27,6 +27,7 @@ keypair_name: ansible_ssh
 keypair_publickey_url: http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
 ssh_user: cloud-user
 
+# security group name must be the same with group name in the inventory.
 security_group_frontend: frontends
 security_group_application: apps
 security_group_database: appdbs
@@ -61,5 +62,3 @@ networks:
     subnet: int_subnet
     external: false
 router_name: router
-
-deployment_name: qe
