@@ -27,6 +27,7 @@
       tower_host: tower1.{{tower_guid}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
+      tower_verify_ssl: no
       ssh_key_data: "/root/.ssh/{{ file_to_copy.stdout }}"
       username: ec2-user
   - name: Update Prod Job template
@@ -36,6 +37,7 @@
       tower_host: tower1.{{tower_guid}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
+      tower_verify_ssl: no
       state: present
       job_type: run
       playbook: site-3tier-app.yml
@@ -47,6 +49,7 @@
       tower_host: tower1.{{tower_guid}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
+      tower_verify_ssl: no
       state: present
       job_type: run
       playbook: site-smoketest-aws.yml

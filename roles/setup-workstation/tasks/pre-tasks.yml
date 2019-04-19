@@ -1,20 +1,14 @@
-- name: Setup Yum repos 
-  shell: scp ctrl.example.com:/etc/yum.repos.d/open.repo /etc/yum.repos.d/open.repo
 - name: yum clean
   shell: yum clean all
-- name: Install EPEL repos 
-  yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    state: present 
 - name: install pip
   yum:
     name:
       - python-pip
-      - gcc
 - name: Install openstacksdk library
   pip:
     name: openstacksdk
     state: latest
+    extra_args: -U
 - name: Create clouds.yaml file
   blockinfile:
     create: yes
