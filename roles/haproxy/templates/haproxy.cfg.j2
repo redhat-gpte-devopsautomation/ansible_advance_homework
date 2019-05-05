@@ -26,5 +26,5 @@ backend app-server-http
     balance roundrobin
     option forwardfor
 {% for host in groups.apps %}
-    server app{{ loop.index }} {{ hostvars[host].ansible_eth0.ipv4.address }}:{{ tomcat_port }} check cookie app{{ loop.index }}
+    server app{{ loop.index }} {{ hostvars[host].ansible_host }}:{{ tomcat_port }} check cookie app{{ loop.index }}
 {% endfor %}

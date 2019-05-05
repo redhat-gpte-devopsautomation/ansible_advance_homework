@@ -27,3 +27,12 @@
     ansible_ssh_private_key_file: ~/.ssh/openstack.pem
     ansible_user: "{{ ssh_user }}"
   with_items: "{{ instances.ansible_facts.openstack_servers }}"
+
+- name: launch instances
+  os_server_action:
+    cloud: "{{ cloud_name }}"
+    server: "{{ hostvars[item].inventory_hostname }}"
+    action: start
+    wait: true
+    timeout: 120
+  with_inventory_hostnames: frontends:apps:appdbs
