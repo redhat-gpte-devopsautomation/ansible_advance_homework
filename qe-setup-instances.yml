@@ -1,0 +1,9 @@
+---
+
+- name: create instances for QE environment
+  hosts: workstation
+  become: true
+  gather_facts: true
+  roles:
+    - { role: osp-servers }
+

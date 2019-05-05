@@ -1,7 +1,18 @@
 ---
 # tasks file for roles/config-tower
-- include_tasks: pre-config-tower.yml
-- include_tasks: post-config-tower.yml
-- include_tasks: ec2_dynamic.yml
-- include_tasks: job_template.yml
-- include_tasks: workflow_template.yml
+
+- name: create project, ivnentory, and credential
+  include_tasks: post_config_tower.yml
+  tags: post_config_tower
+
+- name: create aws ec2 dynamic inventory
+  include_tasks: ec2_dynamic.yml
+  tags: ec2_dynamic
+
+- name: create tower job template
+  include_tasks: job_template.yml
+  tags: job_template
+
+- name: create tower workflow template
+  include_tasks: workflow_template.yml
+  tags: workflow_template

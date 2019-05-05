@@ -1,53 +1,163 @@
-==== Ansible Tower Config
+= Ansible Tower Homework Lab Instruction
+
+== Prerequisites
+
+First deploy the following environments through the OpenTLC lab.
+
+* _Ansible Advanced - Homework_
+* _Ansible Advanced - OpenStack_
+
+NOTE: The OpenTLC lab has limits that only 3 labs can be deployed.
+This homework deploys 3 labs finally, so remove all the labs if you already have any.
 
 
-* From the cloned repo run `site-config-tower.yml` playbook to create job templates and workflow template.
+== Provisioning QE Environment
+
+* Connect to the workstation host for _Ansible Advanced - Homework_.
 
 [source,text]
 ----
-[bastion]$ sudo -i
-[bastion]# cd ansible_advance_homework
-[bastion]# TOWER_GUID=<Ansible Tower Homework GUID from mail>
-[bastion]# OSP_GUID=<Openstack for Ansible GUID from mail>
-[bastion]# OPENTLC_LOGIN=<username-company.com>
-[bastion]# OPENTLC_PASSWORD=<your openlc account password>
-[bastion]# GITHUB_REPO=https://github.com/<githubhandler>/ansible_advance_homework
-[bastion]# JQ_REPO_BASE=http://www.opentlc.com/download/ansible_bootcamp
-[bastion]# REGION=<enter region name example us-east-1>
-[bastion]# RH_MAIL_ID=<your mail id for dynamic inventory tag>
-[bastion]# ansible-playbook site-config-tower.yml -e tower_GUID=${TOWER_GUID} -e osp_GUID=${OSP_GUID} -e opentlc_login=${OPENTLC_LOGIN} -e path_to_opentlc_key=/root/.ssh/mykey.pem -e param_repo_base=${JQ_REPO_BASE} -e opentlc_password=${OPENTLC_PASSWORD} -e REGION_NAME=${REGION} -e EMAIL=${RH_MAIL_ID} -e github_repo=${GITHUB_REPO}
+TOWER_GUID=<Ansible Tower Homework GUID from mail>
+OPENTLC_USERNAME=<Your OpenTLC user name>
+ssh ${OPENTLC_USERNAME}@bastion.${TOWER_GUID}.example.opentlc.com
+scp ~/.ssh/<OPENTLC_KEY> ${OPENTLC_USERNAME}@bastion.${TOWER_GUID}.example.opentlc.com:/tmp/mykey.pem
 ----
 
+NOTE: Specify `~/.ssh/<OPENTLC_KEY>` with your OpenTLC ssh key file.
+
+* Set up the workstation host for _Ansible Advanced - OpenStack_.
+
+[source,text]
+----
+sudo -i
+mv /tmp/mykey.pem ~/.ssh/
+echo "OSP_GUID=<OpenStack GUID from mail>" >> ~/.bashrc
+. ~/.bashrc
+OPENTLC_USERNAME=<Your OpenTLC user name>
+git clone https://github.com/hashnao/ansible_advance_homework.git
+cd ansible_advance_homework/
+sed -i "s/OSP_GUID/${OSP_GUID}/" ssh.cfg
+ansible-playbook qe-setup-workstation.yml \
+-e OSP_GUID=${OSP_GUID} \
+--ask-vault-pass \
+--private-key=/root/.ssh/mykey.pem \
+-u ${OPENTLC_USERNAME}
+----
+
+NOTE: Enter the vault password that encrypts `keystone_password`.
+
+[source,text]
+----
+Vault password:
+----
+
+* Provision instances for QE environment on _Ansible Advanced - OpenStack_.
+
+[source,text]
+----
+ansible-playbook qe-setup-instances.yml -e OSP_GUID=${OSP_GUID}
+----
+
+* TBC: Install the 3-tier applications.
+
+[source,text]
+----
+ansible-playbook setup-3tier-app.yml
+----
+
+* run a smoke test on the QA environment for the three-tier application
+
+[source,text]
+----
+ansible-playbook qe-smoke-test.yml
+----
+
+NOTE: If the smoke test fails and you need to re-create the QE environment,
+you can delete the instances by running the folloing playbook.
+
+[source,text]
+----
+ansible-playbook qe-clean-instances.yml -e OSP_GUID=${OSP_GUID}
+----
+
+
+== Provisioning Production Environment
+
+* Create a credential file for OpenTLC.
+
+[source,text]
+----
+ansible-vault create /tmp/opentlc.yml
+----
+
+NOTE: Enter your OpenTLC ID and password as the prompt appears.
+
+----
+opentlc_username: <OpenTLC user name>
+opentlc_password: <OpenTLC password>
+----
+
+[source,text]
+----
+ansible-playbook prod-setup-instances.yml \
+-e @/tmp/opentlc.yml \
+--ask-vault-pass
+----
+
+
+== Configuring Ansible Tower
+
+* Create Ansible Tower job templates.
+
+[source,text]
+----
+export GITHUB_REPO=https://github.com/hashnao/ansible_advance_homework.git
+export REGION=us-east-1
+export RH_MAIL_ID=<your mail id for dynamic inventory tag>
+echo "TOWER_GUID=<Ansible Tower Homework GUID from mail>" >> ~/.bashrc
+. ~/.bashrc
+ansible-playbook setup-tower.yml \
+-e TOWER_GUID=${TOWER_GUID} \
+-e OSP_GUID=${OSP_GUID} \
+-e REGION_NAME=${REGION} \
+-e EMAIL=${RH_MAIL_ID} \
+-e github_repo=${GITHUB_REPO} \
+-e @/tmp/opentlc.yml \
+--ask-vault-pass
+----
 
 .List of Playbooks
 [%header,cols=2*]
 |===
 | Files or dir | Purpose
-| app-tier | Install application server role
-| db-tier  | Install postgressql server for database role
-| lb-tier  | Install HA proxy role
-| base-config | Setup yum repo and base packages role
-| setup-workstation | Setup workstation, create network, ssh keypair, security group etc. role 
-| osp-servers | Provision OSP Instances role
-| osp-instance-delete | Delete OSP Instances role
-| osp-facts | Genrate in-memory inventory for OSP instances role
-| roles/config-tower/vars/main.yml | Very important file to review. All the variable values are set there. Please do not make any changes in the file
-| config-tower | Role to configure ansible tower job templates and workflow
-| aws_creds.yml | Fetch GUIDkey.pem from bastion of Three tier application env and create machine credential to connect to AWS instances
-| aws_provision.yml | Use `order_svc.sh` script to provision env
-| aws_status_check.yml | Check aws instances are up or not
-| site-3tier-app.yml | Playbook to deploy three tier app
-| site-install-isolated-node.yml | Playbook to install isolated node
-| site-config-tower.yml | Playbook to call role `config-tower`
-| site-osp-delete.yml | Playbook to call role
-| site-osp-instances.yml | Playbook to call role
-| site-setup-workstation.yml | Playbook to call role
-| site-smoke-osp.yml | Playbook to test three tier app on OSP
-| site-smoketest-aws.yml | Playbook to test three tier app on AWS
-| grading-script.yml | Self grading script
-| roles/config-tower/tasks/ec2_dynamic.yml | For creating Dynamic inventory in Ansible tower. Use `AWS Access Key` for credential
-| roles/config-tower/tasks/job_template.yml | For creating job templates
-| roles/config-tower/tasks/pre-config-tower.yml | Any pre config tasks needed
-| roles/config-tower/tasks/workflow_template.yml | genrate workflow from `workflow.yml` file
-| roles/config-tower/tasks/post-config-tower.yml | any post config jobs
+| `qe-setup-workstation.yml` | configures workstation for OpenStack, creates prerequisite resources, and installs isolated node for Ansible Tower.
+| `qe-setup-instances.yml` | creates instances for QE environment.
+| `qe-clean-instances.yml` | removes instances for QE environment.
+| `qe-smoke-test.yml` | runs smoke test for QE environment.
+| `setup-3tier-app.yml` | installs the 3-tier application.
+| `clean-3tier-app.yml` | removes the 3-tier application.
+| `prod-setup-instances.yml` | creates instances for production environment.
+| `prod-smoke-test.yml` | runs smoke test for production environment.
+| `setup-tower.yml` | creates Ansible Tower job templates and workflows.
+| `prod-setup-credentials.yml` | fetches key.pem from bastion and creates machine credential to connect to instances.
+| `prod-check-ssh.yml` | checks ssh connection with instances.
+|===
+
+.List of Roles
+[%header,cols=2*]
+|===
+| `roles/base` | configures yum repository and installs base packages.
+| `roles/tomcat` | installs Tomcat.
+| `roles/postgresql` | installs PostgreSQL.
+| `roles/haproxy` | installs HAProxy.
+| `roles/setup-workstation` | sets up workstation for OpenStack, creates prerequisite objects including network, ssh keypair, security groups.
+| `roles/osp-servers` | provisions instances on OpenStack for 3-tier applications.
+| `roles/osp-instance-delete` | removes instances on OpenStack.
+| `roles/osp-facts` | generates in-memory inventory for instances on OpenStack.
+| `roles/config-tower` | creates Ansible Tower job templates and workflows.
+| `roles/config-tower/vars/main.yml` | contains the variables for Ansible Tower. DO NOT make any changes in the file.
+| `roles/config-tower/tasks/ec2_dynamic.yml | creates Dynamic inventory in Ansible tower. Use `AWS Access Key` for credential.
+| `roles/config-tower/tasks/job_template.yml | creates job templates.
+| `roles/config-tower/tasks/workflow_template.yml | creates workflow based on `templates/workflow.yml.j2`.
+| `roles/config-tower/tasks/post-config-tower.yml | sets up project, inventories, or credentials.
 |===

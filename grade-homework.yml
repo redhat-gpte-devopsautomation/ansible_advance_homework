@@ -1,0 +1,47 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: create in-memory inventory
+    add_host:
+      name: workstation-{{ OSP_GUID }}.rhpds.opentlc.com
+      group: workstation
+      ansible_ssh_private_key_file: ~/.ssh/openstack.pem
+      ansible_ssh_user: cloud-user
+
+- hosts: workstation
+  gather_facts: false
+  vars:
+    - instance_name: "{% for host in groups.frontends %}{{ hostvars[host].inventory_hostname }}{% endfor %}"
+  vars_files:
+    - roles/osp-setup/defaults/main.yml
+    - roles/haproxy/defaults/main.yml
+  roles:
+    - { role: osp-facts, tags: set_server_fact }
+  post_tasks:
+    - name: check http response
+      uri:
+        url: http://{{ item.public_v4 }}/
+        return_content: true
+      register: webpage
+      until: haproxy_expected_response in webpage.content
+      retries: 3
+      delay: 3
+      with_items: "{{ frontend_instance.ansible_facts.openstack_servers }}"
+
+    - name: fail if expected result is not in the page content
+      fail:
+      when: "haproxy_expected_response not in webpage.results[0].content"
+
+# TBC: correct them
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Curl website
+    command: curl "http://frontend1.{{ ANSIBLE_ADVANCE_GUID }}.example.opentlc.com"
+    register: webpage
+  - debug: var=webpage.stdout
+  - name: Fail
+    fail:
+    when: "'Ansible' not in webpage.stdout"
+  - name: Success
+    debug: msg="Congrats Yours HW Assignment is completed"

@@ -1,18 +1,14 @@
 ---
 
-- hosts: workstation
+- hosts: frontends
   gather_facts: false
   vars_files:
     - roles/osp-setup/defaults/main.yml
     - roles/haproxy/defaults/main.yml
-  vars:
-    - instance_name: "{% for host in groups.frontends %}{{ hostvars[host].inventory_hostname }}{% endfor %}"
-  roles:
-    - { role: osp-facts, tags: set_server_fact }
   post_tasks:
     - name: check http response
       uri:
-        url: http://{{ item.public_v4 }}/
+        url: "http://{{ item.public_v4 }}/"
         return_content: true
       register: webpage
       until: haproxy_expected_response in webpage.content

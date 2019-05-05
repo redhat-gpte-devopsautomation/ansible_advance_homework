@@ -1,0 +1,49 @@
+---
+
+- hosts: workstation
+  become: true
+  gather_facts: false
+  vars_files:
+    - roles/config-tower/defaults/main.yml
+  tasks:
+  - name: get script common.sh
+      get_url:
+        url: "{{ opentlc_repo_url }}/scripts/common.sh"
+        dest: /root/common.sh
+        mode: 0755
+
+    - name: get script jq
+      get_url:
+        url: "{{ opentlc_repo_url }}/scripts/jq-linux64"
+        dest: /usr/bin/jq
+        mode: 0755
+
+    - name: get script order_svc.sh
+      get_url:
+        url: "{{ opentlc_repo_url }}/scripts/order_svc.sh"
+        dest: /root/order_svc.sh
+        mode: 0755
+
+    - name: create credentials
+      copy:
+        content: |
+          export username={{ opentlc_username }}
+          export password={{ opentlc_password }}
+          export uri=https://labs.opentlc.com
+        dest: /root/credential.rc
+        mode: 0755
+
+    # Using this script will always deploy environments in the us-east-1 region.
+    # TODO: this shell task is not working yet!
+    - name: order service on opentlc
+      shell: |
+        source /root/credential.rc
+        ./order_svc.sh -y -t 1 -c 'OPENTLC Automation' \
+        -i 'Ansible Advanced - Three Tier App' \
+        -d 'dialog_expiration=7;region=na;nodes=1;dialog_runtime=8'
+      args:
+        chdir: /root
+
+    - name: Wait for mail
+      pause:
+        minutes: 5

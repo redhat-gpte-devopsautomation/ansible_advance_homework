@@ -1,2 +1,68 @@
 ---
-# defaults file for roles/config-tower
+# vars file for roles/config-tower
+
+tower_static_inventory_name: scm_inventory
+tower_ec2_dynamic_inventory: "AWS inventory source"
+tower_ec2_inventory_source: "Three tier inventory source"
+scm_inventory_source: "SCM three tier inventory source"
+tower_tmp_dir: /tmp
+
+tower_job_template_name_osp_instances: "QA environment - provisioning"
+tower_playbook_osp_instances: qe-setup-instances.yml
+tower_job_template_osp_instances_delete: "QA environment - nuke"
+tower_playbook_osp_instances_delete: qe-clean-instances.yml
+tower_job_template_smoke_osp: "QA environment - smoke test"
+tower_playbook_smoke_osp: qe-smoke-test.yml
+tower_job_template_aws_provision: "Production environment - provisioning"
+tower_playbook_aws_provision: prod-setup-instances.yml
+tower_job_template_aws_ssh_keys: "Production environment - configuring ssh keys"
+tower_playbook_aws_ssh: prod-setup-credentials.yml
+tower_job_template_3tier_app: "QA environment - 3-tier application deployment"
+tower_playbook_3tier_app: setup-3tier-app.yml
+tower_job_template_smoke_aws: "Production environment - smoke test"
+tower_playbook_smoke_aws: prod-smoke-test.yml
+tower_job_template_aws_status_check: "Production environment - ec2 instances status check"
+tower_playbook_aws_status: prod-check-ssh.yml
+tower_job_template_3tier_app_aws: "Production environment - 3-tier application deployment"
+tower_playbook_3tier_app_aws: "{{ tower_playbook_3tier_app }}"
+
+tower_project_name: "Homework Assignment"
+tower_organization: Default
+tower_username: admin
+tower_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38373133633866623065616536393430353832653162653731663462303863623634333564373033
+          6232643962336163346536306630346232313165303738380a393735633433613738386631306638
+          30303262623562656230303865393464346161376235643739386635326464346365313166313936
+          6332303661396539640a303564323238323465306436316361613831346233626162343165636236
+          3965
+tower_ssh_cred_name: "Connect_to_workstation"
+tower_ssh_username: cloud-user
+tower_ssh_secretkey_path: /root/.ssh/openstack.pem
+tower_opentlc_secretkey_path: /root/.ssh/mykey.pem
+tower_aws_read_keys: "AWS Access Key"
+tower_aws_cred_name: "Credentials of ec2 instances"
+tower_aws_region_name: "{{ REGION_NAME }}"
+tower_tag_filters: "tag:instance_filter=three-tier-app-{{ EMAIL }}"
+tower_opentlc_cred_name: "Opentlc key"
+# TBC: Check if it's used.
+vault_name: yum_repo_vault
+tower_group_name: workstation
+tower_host_name: workstation-{{ OSP_GUID }}.rhpds.opentlc.com
+tower_ec2_dynamic_inventory_group_first:
+  - apps
+  - appdbs
+  - frontends
+  - bastions
+tower_ec2_dynamic_inventory_group_second:
+  - tag_AnsibleGroup_bastions
+  - tag_AnsibleGroup_frontends
+  - tag_AnsibleGroup_apps
+  - tag_AnsibleGroup_appdbs
+tower_instance_group_name: osp
+tower_workflow_template: cicd
+# TBC: Check if it's used.
+scm_branch: master
+scm_url: "{{ github_repo }}"
+path_to_scm_inventory: scm_inventory
+opentlc_repo_url: http://www.opentlc.com/download/ansible_bootcamp

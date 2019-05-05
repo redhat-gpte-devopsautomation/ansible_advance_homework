@@ -1,0 +1,65 @@
+---
+
+- name: create homework assignment project
+  tower_project:
+    name: "{{ tower_project_name }}"
+    organization: "{{ tower_organization }}"
+    state: present
+
+- name: create machine credentail to connect to workstation
+  tower_credential:
+    name: "{{ tower_ssh_cred_name }}"
+    organization: "{{ tower_organization }}"
+    kind: ssh
+    tower_host: "tower1.{{ TOWER_GUID }}.example.opentlc.com"
+    tower_username: "{{ tower_username }}"
+    tower_password: "{{ tower_password }}"
+    ssh_key_data: "{{ tower_ssh_secretkey_path }}"
+    username: "{{ tower_ssh_username }}"
+    state: present
+
+- name: create static inventory
+  tower_inventory:
+    name: "{{ tower_static_inventory_name }}"
+    organization: "{{ tower_organization }}"
+
+- name: create group in static inventory
+  tower_group:
+    name: "{{ tower_group_name }}"
+    inventory: "{{ tower_static_inventory_name }}"
+
+- name: add workstation host in tower_inventory
+  tower_host:
+    name: "{{ tower_host_name }}"
+    inventory: "{{ tower_static_inventory_name }}"
+
+- name: associate workstation host to group
+  command: |
+    tower-cli host associate --host "{{ tower_host_name }}" \
+    --group "{{ tower_group_name }}"
+
+# TBC: remove this task as it's not relevant to copy the key file.
+- name: copy opentlc ssh keys
+  copy:
+    src: "{{ tower_opentlc_secretkey_path }}"
+    dest: "{{ tower_tmp_dir }}/secret.pem"
+
+- name: create credential
+  tower_credential:
+    name: "{{ tower_opentlc_cred_name }}"
+    organization: "{{ tower_organization }}"
+    kind: ssh
+    # TBC: get hostname from static inventory or openstack facts
+    tower_host: "tower1.{{ TOWER_GUID }}.example.opentlc.com"
+    tower_username: "{{ tower_username }}"
+    tower_password: "{{ tower_password }}"
+    tower_verify_ssl: no
+    ssh_key_data: "{{ lookup('file', '{{ tower_opentlc_secretkey_path }}') }}"
+    username: "{{ opentlc_username }}"
+    state: present
+
+# TBC: remove this task as it's not relevant to copy the key file.
+- name: remove secret
+  file:
+    name: "{{ tower_tmp_dir }}/secret.pem"
+    state: absent
