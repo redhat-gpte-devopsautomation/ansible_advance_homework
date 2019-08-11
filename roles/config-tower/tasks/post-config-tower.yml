@@ -1,5 +1,7 @@
 - name: Create Homework Assignment project 
 # Use tower module or tower-cli to create Ansible Tower project. Name of the project is specifed in ./vars/main.yml
+  command: |
+    tower-cli project create -n "{{proj_name}}"
 
 - name: Machine Credentail to connect to workstation using openstack.pub
   tower_credential:
@@ -7,10 +9,10 @@
     organization: Default
     state: present
     kind: ssh
-    tower_host: tower1.{{tower_GUID}}.example.opentlc.com
+    tower_host: tower1.{{TOWER_GUID}}.example.opentlc.com
     tower_username: admin
     tower_password: r3dh4t1!
-    ssh_key_data: "/root/.ssh/openstack.pem"
+#    ssh_key_data: "{{ lookup('file', '/root/.ssh/openstack.pub') }}"
     username: cloud-user
 
 - name: Create Inventory
@@ -36,11 +38,11 @@
     organization: Default
     state: present
     kind: ssh
-    tower_host: tower1.{{tower_GUID}}.example.opentlc.com
+    tower_host: tower1.{{TOWER_GUID}}.example.opentlc.com
     tower_username: admin
     tower_password: r3dh4t1!
     tower_verify_ssl: no
-    ssh_key_data: /root/.ssh/mykey.pem
+#    ssh_key_data: "{{ lookup('file', '/root/.ssh/openstack.pub') }}"
     username: "{{ opentlc_login }}"
 
 - name: Remove secret

@@ -24,7 +24,7 @@
       organization: Default
       state: present
       kind: ssh
-      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_host: tower1.{{TOWER_GUID}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
       tower_verify_ssl: no
@@ -34,7 +34,7 @@
     tower_job_template:
       name: "3 tier app on Prod"
       machine_credential: "Creds for AWS instances"
-      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_host: tower1.{{TOWER_GUID}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
       tower_verify_ssl: no
@@ -46,7 +46,7 @@
     tower_job_template:
       name: "Smoke test Prod env"
       machine_credential: "Creds for AWS instances"
-      tower_host: tower1.{{tower_guid}}.example.opentlc.com
+      tower_host: tower1.{{TOWER_GUID}}.example.opentlc.com
       tower_username: admin
       tower_password: r3dh4t1!
       tower_verify_ssl: no
