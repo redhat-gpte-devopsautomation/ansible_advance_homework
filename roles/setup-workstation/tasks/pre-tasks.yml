@@ -4,7 +4,7 @@
   yum:
     name:
       - python-pip
-  warn: false
+    warn: false
 - name: Install openstacksdk library
   pip:
     name: "{{ item }}"
