@@ -4,11 +4,23 @@
   yum:
     name:
       - python-pip
+  warn: false
 - name: Install openstacksdk library
   pip:
-    name: openstacksdk
+    name: "{{ item }}"
     state: latest
     extra_args: -U
+  with_items:
+    - futures
+    - openstacksdk
+- name: fix import statements for queue library in Python2.7
+  replace:
+    path: "{{ item }}"
+    regex: 'import queue'
+    replace: 'import Queue from queue'
+  with_items:
+    - /usr/lib/python2.7/site-packages/openstack/cloud/openstackcloud.py
+    - /usr/lib/python2.7/site-packages/openstack/utils.py
 - name: Create clouds.yaml file
   blockinfile:
     create: yes
